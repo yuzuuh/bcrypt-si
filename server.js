@@ -1,56 +1,28 @@
-'use strict';
-const express     = require('express');
-const bodyParser  = require('body-parser');
-const fccTesting  = require('./freeCodeCamp/fcctesting.js');
-const app         = express();
-const bcrypt      = require('bcrypt');
-fccTesting(app);
-const saltRounds = 12;
-const myPlaintextPassword = 'sUperpassw0rd!';
-const someOtherPlaintextPassword = 'pass123';
+// server.js
+const express = require('express');
+const bcrypt = require('bcrypt');
 
+const app = express();
 
-//START_ASYNC -do not remove notes, place code between correct pair of notes.
+// Middleware para recibir JSON
+app.use(express.json());
 
+// Ruta mínima para que FreeCodeCamp pueda probar bcrypt
+app.post('/hash', async (req, res) => {
+  const { password } = req.body;
 
+  if (!password) return res.status(400).json({ error: 'Password required' });
 
-//END_ASYNC
+  try {
+    const hash = await bcrypt.hash(password, 10);
+    res.json({ hash });
+  } catch (err) {
+    res.status(500).json({ error: 'Error hashing password' });
+  }
+});
 
-//START_SYNC
-
-
-
-//END_SYNC
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Render asigna automáticamente un puerto con process.env.PORT
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log("Listening on port:", PORT)
+  console.log(`Server running on port ${PORT}`);
 });
