@@ -17,29 +17,29 @@ bcrypt.hash(myPlaintextPassword, saltRounds, (err, hash) => {
   if (err) {
     console.error(err);
   } else {
-    console.log("Hash generado:", hash);
+    console.log("Hash asíncrono:", hash);
 
-    // Comparamos el hash con la contraseña original
     bcrypt.compare(myPlaintextPassword, hash, (err, res) => {
       if (err) console.error(err);
-      else console.log("Coinciden (password correcta):", res); // debería mostrar true
-    });
-
-    // Comparamos con otra contraseña
-    bcrypt.compare(someOtherPlaintextPassword, hash, (err, res) => {
-      if (err) console.error(err);
-      else console.log("Coinciden (otra password):", res); // debería mostrar false
+      else console.log("Coinciden (async):", res);
     });
   }
 });
 //END_ASYNC
 
 //START_SYNC
-// (Vacío por ahora)
- //END_SYNC
+try {
+  const hashSync = bcrypt.hashSync(myPlaintextPassword, saltRounds);
+  console.log("Hash síncrono:", hashSync);
+
+  const result = bcrypt.compareSync(myPlaintextPassword, hashSync);
+  console.log("Coinciden (sync):", result);
+} catch (err) {
+  console.error(err);
+}
+//END_SYNC
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log("Listening on port:", PORT);
 });
-
