@@ -1,30 +1,36 @@
-// server.js
+'use strict';
 const express = require('express');
-const bcrypt = require('bcrypt');
-
+const bodyParser = require('body-parser');
+const fccTesting = require('./freeCodeCamp/fcctesting.js');
+const bcrypt = require('bcrypt'); // <= requerido tal cual
 const app = express();
+const cors = require('cors');
+app.use(cors());
+fccTesting(app);
 
-// Middleware para recibir JSON
-app.use(express.json());
+const saltRounds = 12;
+const myPlaintextPassword = 'sUperpassw0rd!';
+const someOtherPlaintextPassword = 'pass123';
 
-// GET para probar en navegador
-app.get('/', (req, res) => {
-  res.send('Servidor corriendo 😄');
-});
-
-// POST mínimo que FreeCodeCamp revisa
-app.post('/hash', async (req, res) => {
-  const { password } = req.body;
-  if (!password) return res.status(400).json({ error: 'Password required' });
-
-  try {
-    const hash = await bcrypt.hash(password, 10);
-    res.json({ hash });
-  } catch {
-    res.status(500).json({ error: 'Error hashing password' });
+//START_ASYNC -do not remove notes, place code between correct pair of notes.
+bcrypt.hash(myPlaintextPassword, saltRounds, (err, hash) => {
+  if (err) console.error(err);
+  else {
+    console.log('Hash asíncrono:', hash);
+    bcrypt.compare(myPlaintextPassword, hash, (err, result) => {
+      console.log('Coincide (async)?', result);
+    });
   }
 });
+//END_ASYNC
 
-// Puerto dinámico para Render o local
+//START_SYNC
+const hashSync = bcrypt.hashSync(myPlaintextPassword, saltRounds);
+console.log('Hash síncrono:', hashSync);
+const resultSync = bcrypt.compareSync(myPlaintextPassword, hashSync);
+console.log('Coincide (sync)?', resultSync);
+//END_SYNC
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log('Listening on port ' + PORT));
+
